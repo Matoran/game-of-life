@@ -21,7 +21,7 @@
  *
  *
  */
-void createThreads(const char *hash, int numberThreads) {
+void createThreads(int numberThreads) {
 
 }
 
