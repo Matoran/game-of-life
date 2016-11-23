@@ -5,7 +5,7 @@
 #include "gfx.h"
 
 int main(int argc, char const *argv[]) {
-    struct gfx_context_t *ctxt = gfx_create("Example", 1000, 500);
+    struct gfx_context_t *ctxt = gfx_create("Example", 1920, 1080);
     if (!ctxt) {
         fprintf(stderr, "Graphic mode initialization failed!\n");
         return EXIT_FAILURE;

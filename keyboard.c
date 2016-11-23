@@ -28,11 +28,14 @@ void *keyboard(void *param){
     printf("%lf\n", microSecondToWait);
     while (!*end) {
         clock_gettime(CLOCK_REALTIME, &start);
-        if(keypress() == SDLK_ESCAPE)
+        if(keypress() == SDLK_ESCAPE){
             *end = true;
+            return NULL;
+        }
         clock_gettime(CLOCK_REALTIME, &finish);
         double elapsed = (finish.tv_nsec - start.tv_nsec) / 1000.0;
         printf("%lf\n", elapsed);
         usleep(microSecondToWait-elapsed);
     }
+    return NULL;
 }

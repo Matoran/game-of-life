@@ -5,24 +5,24 @@
 #include <stdbool.h>
 
 typedef struct paramsThreadsSt{
-    int numberThreads;
-    int idThread;
+    uint numberThreads;
+    uint idThread;
     sem_t *barrier;
     bool **oldState, **actualState;
-    int width, height;
+    uint width, height;
     bool *end;
 }paramsThreadsSt;
 
 typedef struct paramsDisplaySt{
     bool **state;
-    int width, height;
+    uint width, height;
     bool *end;
     sem_t *barrier;
-    int numberThreads;
+    uint numberThreads;
 }paramsDisplaySt;
 
-extern void createThreads(int numberThreads, int width, int height, bool **oldState);
-void *worker(void *paramsThreads);
-void *display(void *paramsThread);
+extern void createThreads(uint numberThreads, uint width, uint height, bool **oldState);
+extern void *worker(void *paramsThreads);
+extern void *display(void *paramsThread);
 
 #endif

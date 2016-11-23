@@ -1,11 +1,11 @@
 # Variables Definition
 version = gcc -std=gnu99
-flags = -g -Wall -Wextra -LSDL2
-clean = rm -rf *.o crack hash
+flags = -g -Wall -Wextra
+clean = rm -rf *.o gameoflife keyboardTester
 
 # Main compilation
-gameoflife : main.o
-	$(version) main.o -lpthread
+gameoflife : main.o thread.o keyboard.o gfx.o
+	$(version) main.o thread.o keyboard.o gfx.o -lrt -lpthread -lSDL2
 main.o : main.c
 	$(version) -c main.c $(flags)
 
@@ -14,8 +14,12 @@ keyboardTester : keyboardTester.c keyboard.o
 	$(version) -c keyboardTester.c keyboard.o $(flags) -o keyboardTester
 
 # Thread compilation
-thread.o : thread.c thread.h  threadprivate.h
-	$(version) -c thread.c $(flags) -lpthread
+thread.o : thread.c thread.h gfx.c gfx.h
+	$(version) -c gfx.c thread.c $(flags)
+
+# Thread compilation
+gfx.o : gfx.c gfx.h
+	$(version) -c gfx.c $(flags)
 
 # Keyboard compilation
 keyboard.o : keyboard.c keyboard.h

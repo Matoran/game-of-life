@@ -5,18 +5,12 @@
  * Date : 23 november 2016
  */
 
-#define _GNU_SOURCE
-
-#include <crypt.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include "gfx.h"
 #include "thread.h"
 #include "keyboard.h"
-#include <semaphore.h>
-#include <stdbool.h>
 
 /*
  *   Generate a number of threads
@@ -24,19 +18,25 @@
  *
  *
  */
-void createThreads(int numberThreads, int width, int height, bool **oldState) {
+void createThreads(uint numberThreads, uint width, uint height, bool **oldState) {
     pthread_t threads[numberThreads+2];
     paramsThreadsSt paramsThread[numberThreads];
     sem_t barrier;
     sem_init(&barrier, 0, 0);
     bool end = false;
-    for (int i = 0; i < numberThreads; i++) {
+
+    bool **state = malloc(sizeof(bool*)*width);
+    for (uint line = 0; line < height ; ++line) {
+        state[line] = malloc(sizeof(bool)*width);
+    }
+    for (uint i = 0; i < numberThreads; i++) {
         paramsThread[i].idThread = i;
         paramsThread[i].numberThreads = numberThreads;
         paramsThread[i].barrier = &barrier;
         paramsThread[i].width = width;
         paramsThread[i].height = height;
         paramsThread[i].oldState = oldState;
+        paramsThread[i].actualState = state;
         paramsThread[i].end = &end;
         int code = pthread_create(&threads[i], NULL, worker, &paramsThread[i]);
         if (code != 0) {
@@ -59,7 +59,7 @@ void createThreads(int numberThreads, int width, int height, bool **oldState) {
         fprintf(stderr, "pthread_create failed!\n");
     }
 
-    for (int i = 0; i < numberThreads+2; ++i) {
+    for (uint i = 0; i < numberThreads+2; ++i) {
         pthread_join(threads[i], NULL);
     }
 
@@ -94,7 +94,7 @@ void *worker(void *paramsThreads) {
     int size = (params->height-2)*(params->width-2);
     int line,column;
 
-    while(!params->end){
+    while(!*params->end){
         line = jump / (params->width-2) + 1;
         column = jump % (params->height-2) + 1;
 
@@ -117,11 +117,13 @@ void *worker(void *paramsThreads) {
         }
 
         jump += params->numberThreads;
-        if(jump <= size){
-            sem_wait(params->barrier);
+        if(jump >= size){
+            sem_post(params->barrier);
             jump = params->idThread;
         }
     }
+    sem_post(params->barrier);
+    return NULL;
 }
 
 void *display(void *paramsDisplay){
@@ -134,21 +136,21 @@ void *display(void *paramsDisplay){
     }
 
     while (!*params->end) {
-        for (int i = 0; i < params->numberThreads; ++i) {
-            sem_wait(params->barrier);
-        }
-
         gfx_clear(ctxt, COLOR_BLACK);
-        for (int line = 0; line < params->width; ++line) {
-            for (int column = 0; column < params->height; ++column) {
+        for (uint line = 0; line < params->height; ++line) {
+            for (uint column = 0; column < params->width; ++column) {
                 if(params->state[line][column]){
-                    gfx_putpixel(ctxt, line, column, COLOR_GREEN);
+                    gfx_putpixel(ctxt, column, line, COLOR_GREEN);
                 }
 
             }
         }
         gfx_present(ctxt);
+        for (uint i = 0; i < params->numberThreads; ++i) {
+            sem_wait(params->barrier);
+        }
     }
 
     gfx_destroy(ctxt);
+    return NULL;
 }
