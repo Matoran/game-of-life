@@ -22,16 +22,23 @@ int main(int argc, char const *argv[]) {
     struct timespec start, finish;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    errors = checkSyntaxError(argc, *argv);
+    int width = atoi(argv[1]);
+    int height = atoi(argv[2]);
+    int seed = atoi(argv[3]);
+    double p = atof(argv[4]);
+    int freq = atoi(argv[5])
+    int workers = atoi(argv[6]);
+
+    int errors = checkSyntaxError(argc,width, height, seed, p, freq, workers);
     if (errors > 0) {
         printf("Total errors : %s\n", errors);
         return EXIT_FAILURE;
     }
 
-     double elapsed = finish.tv_sec - start.tv_sec;
-     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-     printf("Executed time: %f s\n", elapsed);
-     return EXIT_SUCCESS;
+    double elapsed = finish.tv_sec - start.tv_sec;
+    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    printf("Executed time: %f s\n", elapsed);
+    return EXIT_SUCCESS;
 }
 
 /*
@@ -42,7 +49,7 @@ int main(int argc, char const *argv[]) {
  *
  *   returns: number of errors.
  */
-int checkSyntaxError(int argc, char const *argv[]){
+int checkSyntaxError(int argc, int width, int height, int seed, double p, int freq, int workers){
     int syntaxError = 0;
 
     if (argc < 7) {
@@ -51,22 +58,26 @@ int checkSyntaxError(int argc, char const *argv[]){
         return syntaxError++;
     }
 
-    if ((argv[1] < 4) || (argv[2]< 4)) {
+    if ((width < 4) || (height < 4)) {
         syntaxError ++;
         printf("Usage for param <width> and <height> : need to be >= 4\n");
     }
 
-    if ((argv[4] < 0) || (argv[4] > 1)) {
+    if (seed <= 0) {
+        syntaxError ++;
+        printf("Usage for param <seed> : need to be > 0\n");
+    }
+    if ((p < 0.0) || (p > 1.0)) {
         syntaxError ++;
         printf("Usage for param <p> : need to be between 0 and 1\n");
     }
 
-    if (argv[5] <= 0) {
+    if (freq <= 0) {
         syntaxError ++;
         printf("Usage for param <freq> : need to be between > 0\n");
     }
 
-    if (argv[6] < 1) {
+    if (workers < 1) {
         syntaxError ++;
         printf("Usage for param <#workers> : need to be between >= 1\n");
     }
