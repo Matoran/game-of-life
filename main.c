@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
     struct timespec start, finish;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    errors = checkSyntaxError()
+    errors = checkSyntaxError(argc, *argv);
     if (errors > 0) {
         printf("Total errors : %s\n", errors);
         return EXIT_FAILURE;
@@ -32,21 +32,23 @@ int main(int argc, char const *argv[]) {
      elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
      printf("Executed time: %f s\n", elapsed);
      return EXIT_SUCCESS;
-
 }
 
 /*
  *   Check all syntax Errors
+ // *
+ *   argc: argument counter
+ *   argv: table of arguments
  *
  *   returns: number of errors.
  */
-int checkSyntaxError(){
+int checkSyntaxError(int argc, char const *argv[]){
     int syntaxError = 0;
 
     if (argc < 7) {
         printf("Usage: ./gameoflife <width> <height> <seed> <p> <freq> <#workers>\n");
-        printf("Example: gameoflife 240 135 0 0.75 30 8\n");`
-        return syntaxError++;`
+        printf("Example: gameoflife 240 135 0 0.75 30 8\n");
+        return syntaxError++;
     }
 
     if ((argv[1] < 4) || (argv[2]< 4)) {
