@@ -13,7 +13,16 @@ typedef struct paramsThreadsSt{
     bool *end;
 }paramsThreadsSt;
 
+typedef struct paramsDisplaySt{
+    bool **state;
+    int width, height;
+    bool *end;
+    sem_t *barrier;
+    int numberThreads;
+}paramsDisplaySt;
+
 extern void createThreads(int numberThreads, int width, int height, bool **oldState);
-void *thread(void *paramsThreads);
+void *worker(void *paramsThreads);
+void *display(void *paramsThread);
 
 #endif

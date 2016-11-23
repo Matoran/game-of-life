@@ -12,8 +12,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "string.h"
+#include "gfx.h"
 #include "thread.h"
+#include "keyboard.h"
 #include <semaphore.h>
 #include <stdbool.h>
 
@@ -24,10 +25,11 @@
  *
  */
 void createThreads(int numberThreads, int width, int height, bool **oldState) {
-    pthread_t threads[numberThreads];
+    pthread_t threads[numberThreads+2];
     paramsThreadsSt paramsThread[numberThreads];
     sem_t barrier;
     sem_init(&barrier, 0, 0);
+    bool end = false;
     for (int i = 0; i < numberThreads; i++) {
         paramsThread[i].idThread = i;
         paramsThread[i].numberThreads = numberThreads;
@@ -35,11 +37,32 @@ void createThreads(int numberThreads, int width, int height, bool **oldState) {
         paramsThread[i].width = width;
         paramsThread[i].height = height;
         paramsThread[i].oldState = oldState;
-        int code = pthread_create(&threads[i], NULL, thread, &paramsThread[i]);
+        paramsThread[i].end = &end;
+        int code = pthread_create(&threads[i], NULL, worker, &paramsThread[i]);
         if (code != 0) {
             fprintf(stderr, "pthread_create failed!\n");
         }
     }
+    paramsDisplaySt paramsDisplay;
+    paramsDisplay.end = &end;
+    paramsDisplay.height = height;
+    paramsDisplay.width = width;
+    paramsDisplay.state = oldState;
+    paramsDisplay.barrier = &barrier;
+    paramsDisplay.numberThreads = numberThreads;
+    int code = pthread_create(&threads[numberThreads], NULL, display, &paramsDisplay);
+    if (code != 0) {
+        fprintf(stderr, "pthread_create failed!\n");
+    }
+    code = pthread_create(&threads[numberThreads+1], NULL, keyboard, &end);
+    if (code != 0) {
+        fprintf(stderr, "pthread_create failed!\n");
+    }
+
+    for (int i = 0; i < numberThreads+2; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+
 }
 
 
@@ -63,7 +86,7 @@ int neighbour(bool **oldState, int line, int column){
  *   paramsThread: struct which contain all information to perform the task
  *
  */
-void *thread(void *paramsThreads) {
+void *worker(void *paramsThreads) {
     paramsThreadsSt *params = (paramsThreadsSt *) paramsThreads;
 
     int nbNeighbour;
@@ -99,4 +122,33 @@ void *thread(void *paramsThreads) {
             jump = params->idThread;
         }
     }
+}
+
+void *display(void *paramsDisplay){
+    paramsDisplaySt *params = (paramsDisplaySt*)paramsDisplay;
+
+    struct gfx_context_t *ctxt = gfx_create("Example", params->width, params->height);
+    if (!ctxt) {
+        fprintf(stderr, "Graphic mode initialization failed!\n");
+        exit(1);
+    }
+
+    while (!*params->end) {
+        for (int i = 0; i < params->numberThreads; ++i) {
+            sem_wait(params->barrier);
+        }
+
+        gfx_clear(ctxt, COLOR_BLACK);
+        for (int line = 0; line < params->width; ++line) {
+            for (int column = 0; column < params->height; ++column) {
+                if(params->state[line][column]){
+                    gfx_putpixel(ctxt, line, column, COLOR_GREEN);
+                }
+
+            }
+        }
+        gfx_present(ctxt);
+    }
+
+    gfx_destroy(ctxt);
 }

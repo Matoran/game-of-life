@@ -35,3 +35,4 @@
 *.iml
 *.xml
 *.txt
+.idea/*
