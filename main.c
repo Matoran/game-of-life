@@ -36,7 +36,8 @@ int main(int argc, char const *argv[]) {
 }
 
 /*
- *   Check all syntax Error
+ *   Check all syntax Errors
+ *
  *   returns: number of errors.
  */
 int checkSyntaxError(){

@@ -6,6 +6,7 @@ clean = rm -rf *.o crack hash
 # Main compilation
 gameoflife : main.o
 	$(version) main.o -lpthread
+
 main.o : main.c
 	$(version) -c main.c $(flags)
 
