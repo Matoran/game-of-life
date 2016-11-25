@@ -8,9 +8,23 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "gfx.h"
 #include "thread.h"
 #include "keyboard.h"
+
+void printTable(uint width, uint height, bool **oldState){
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            if(oldState[i][j]){
+                printf("1 ");
+            }else{
+                printf("0 ");
+            }
+        }
+        printf("\n");
+    }
+}
 
 /*
  *   Generate a number of threads
@@ -21,8 +35,10 @@
 void createThreads(uint numberThreads, uint width, uint height, bool **oldState) {
     pthread_t threads[numberThreads+2];
     paramsThreadsSt paramsThread[numberThreads];
-    sem_t barrier;
-    sem_init(&barrier, 0, 0);
+
+    pthread_barrier_t barrier;
+    pthread_barrier_init(&barrier, NULL, numberThreads+1);
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     bool end = false;
 
     bool **state = malloc(sizeof(bool*)*width);
@@ -32,7 +48,7 @@ void createThreads(uint numberThreads, uint width, uint height, bool **oldState)
     for (uint i = 0; i < numberThreads; i++) {
         paramsThread[i].idThread = i;
         paramsThread[i].numberThreads = numberThreads;
-        paramsThread[i].barrier = &barrier;
+        paramsThread[i].workerDisplayBarrier = &barrier;
         paramsThread[i].width = width;
         paramsThread[i].height = height;
         paramsThread[i].oldState = oldState;
@@ -48,7 +64,7 @@ void createThreads(uint numberThreads, uint width, uint height, bool **oldState)
     paramsDisplay.height = height;
     paramsDisplay.width = width;
     paramsDisplay.state = oldState;
-    paramsDisplay.barrier = &barrier;
+    paramsDisplay.workerDisplayBarrier = &barrier;
     paramsDisplay.numberThreads = numberThreads;
     int code = pthread_create(&threads[numberThreads], NULL, display, &paramsDisplay);
     if (code != 0) {
@@ -62,6 +78,7 @@ void createThreads(uint numberThreads, uint width, uint height, bool **oldState)
     for (uint i = 0; i < numberThreads+2; ++i) {
         pthread_join(threads[i], NULL);
     }
+    pthread_barrier_destroy(&barrier);
 
 }
 
@@ -95,8 +112,8 @@ void *worker(void *paramsThreads) {
     int line,column;
 
     while(!*params->end){
-        line = jump / (params->width-2) + 1;
-        column = jump % (params->height-2) + 1;
+        line = jump / (params->width-2)+1;
+        column = jump % (params->width-2)+1;
 
         nbNeighbour = neighbour(params->oldState, line, column);
 
@@ -111,18 +128,29 @@ void *worker(void *paramsThreads) {
                 params->actualState[line][column] = false;
             }
         }else{
-            if(nbNeighbour == 3){
-                params->actualState[line][column] = true;
-            }
+            params->actualState[line][column] = (nbNeighbour == 3);
         }
 
         jump += params->numberThreads;
         if(jump >= size){
-            sem_post(params->barrier);
             jump = params->idThread;
+            //wait all workers with one workerDisplayBarrier
+            pthread_barrier_wait(params->workerDisplayBarrier);
+            //attendre l'affichage
+            //ZONE CRITIQUE
+            jump = params->idThread;
+            while(jump < size){
+                line = jump / (params->width-2) + 1;
+                column = jump % (params->width-2) + 1;
+                jump += params->numberThreads;
+                params->oldState[line][column] = params->actualState[line][column];
+            }
+            jump = params->idThread;
+            //FIN ZONE CRITIQUE
+            pthread_barrier_wait(params->workerDisplayBarrier);
+            //attendre tous les travailleurs
         }
     }
-    sem_post(params->barrier);
     return NULL;
 }
 
@@ -146,11 +174,10 @@ void *display(void *paramsDisplay){
             }
         }
         gfx_present(ctxt);
-        for (uint i = 0; i < params->numberThreads; ++i) {
-            sem_wait(params->barrier);
-        }
+        pthread_barrier_wait(params->workerDisplayBarrier);
+        pthread_barrier_wait(params->workerDisplayBarrier);
+        usleep(10000);
     }
-
     gfx_destroy(ctxt);
     return NULL;
 }

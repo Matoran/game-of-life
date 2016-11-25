@@ -84,7 +84,9 @@ int main(int argc, char const *argv[]) {
         state[line] = malloc(sizeof(bool)*width);
         for (uint column = 0; column < width; ++column) {
             float random = (float)rand()/(float)(RAND_MAX);
-            if (random < probability) {
+            if(line == 0 || line == height-1 || column == 0 || column == width-1){
+                state[line][column] = false;
+            }else if (random < probability) {
                 state[line][column] = true;
             } else {
                 state[line][column] = false;
