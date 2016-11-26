@@ -23,7 +23,6 @@ int checkSyntaxError(uint width, uint height, double probability, uint freq, uin
     int syntaxError = 0;
 
 
-
     if ((width < 4) || (height < 4)) {
         syntaxError++;
         printf("Usage for param <width> and <height> : need to be >= 4\n");
@@ -70,35 +69,33 @@ int main(int argc, char const *argv[]) {
     uint height = atoi(argv[2]);
     uint seed = atoi(argv[3]);
     double probability = atof(argv[4]);
-    uint freq = atoi(argv[5]);
+    uint frequency = atoi(argv[5]);
     uint workers = atoi(argv[6]);
 
-    int errors = checkSyntaxError(width, height, probability, freq, workers);
+    int errors = checkSyntaxError(width, height, probability, frequency, workers);
     if (errors > 0) {
         printf("Total errors : %d\n", errors);
         return EXIT_FAILURE;
     }
     srand(seed);
-    bool **state = malloc(sizeof(bool*)*width);
-    for (uint line = 0; line < height ; ++line) {
-        state[line] = malloc(sizeof(bool)*width);
+    bool **state = malloc(sizeof(bool *) * width);
+    for (uint line = 0; line < height; ++line) {
+        state[line] = malloc(sizeof(bool) * width);
         for (uint column = 0; column < width; ++column) {
-            float random = (float)rand()/(float)(RAND_MAX);
-            if(line == 0 || line == height-1 || column == 0 || column == width-1){
+            float random = (float) rand() / (float) (RAND_MAX);
+            if (line == 0 || line == height - 1 || column == 0 || column == width - 1) {
                 state[line][column] = false;
-            }else if (random < probability) {
+            } else if (random < probability) {
                 state[line][column] = true;
             } else {
                 state[line][column] = false;
             }
         }
     }
-    createThreads(workers, width, height, state);
+    createThreads(workers, width, height, state, frequency);
     clock_gettime(CLOCK_REALTIME, &finish);
     double elapsed = finish.tv_sec - start.tv_sec;
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
     printf("Executed time: %f s\n", elapsed);
     return EXIT_SUCCESS;
 }
-
-

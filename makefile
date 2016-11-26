@@ -5,14 +5,16 @@ clean = rm -rf *.o gameoflife keyboardTester
 
 # Main compilation
 gameoflife : main.o thread.o keyboard.o gfx.o
-	$(version) main.o thread.o keyboard.o gfx.o -lrt -lpthread -lSDL2
+	$(version) main.o thread.o keyboard.o gfx.o -o gameoflife -lrt -lpthread -lSDL2
 main.o : main.c
 	$(version) -c main.c $(flags)
 
 # Keyboard Tester
-keyboardTester : keyboardTester.c keyboard.o
-	$(version) -c keyboardTester.c keyboard.o $(flags) -o keyboardTester
+keyboardTester : keyboardTester.o keyboard.o gfx.o
+	$(version) keyboardTester.o keyboard.o gfx.o $(flags) -o keyboardTester -lSDL2
 
+keyboardTester.o : keyboardTester.c
+	$(version) -c keyboardTester.c $(flags)
 # Thread compilation
 thread.o : thread.c thread.h gfx.c gfx.h
 	$(version) -c gfx.c thread.c $(flags)

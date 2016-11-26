@@ -13,7 +13,7 @@
 #define COLOR_WHITE  0x00FFFFFF
 #define COLOR_YELLOW 0x00FFFF00
 
-typedef unsigned int  uint;
+typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef unsigned char uchar;
 
