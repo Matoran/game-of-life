@@ -36,9 +36,17 @@ void *display(void *paramsDisplay) {
         pthread_barrier_wait(params->workerDisplayBarrier);
 
         clock_gettime(CLOCK_REALTIME, &finish);
-        double elapsed = (finish.tv_nsec - start.tv_nsec) / 1000.0;
-        if (microSecondToWait - elapsed > 0)
+        double elapsed = (finish.tv_sec-start.tv_sec)*1000000;
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000.0;
+        if (microSecondToWait - elapsed > 0){
             usleep(microSecondToWait - elapsed);
+            printf("%lf\n", microSecondToWait - elapsed);
+            printf("f %d\n", finish.tv_nsec);
+            printf("fs %d\n", finish.tv_sec);
+            printf("s %d\n", start.tv_nsec);
+            printf("ss %d\n", start.tv_sec);
+        }
+
     }
 
     gfx_destroy(ctxt);

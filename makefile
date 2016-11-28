@@ -4,8 +4,8 @@ flags = -g -Wall -Wextra
 clean = rm -rf *.o gameoflife keyboardTester
 
 # Main compilation
-gameoflife : main.o thread.o keyboard.o gfx.o
-	$(version) main.o thread.o keyboard.o gfx.o -o gameoflife -lrt -lpthread -lSDL2
+gameoflife : main.o thread.o keyboard.o gfx.o display.o worker.o
+	$(version) main.o thread.o keyboard.o gfx.o display.o worker.o -o gameoflife -lrt -lpthread -lSDL2
 main.o : main.c
 	$(version) -c main.c $(flags)
 
@@ -26,6 +26,12 @@ gfx.o : gfx.c gfx.h
 # Keyboard compilation
 keyboard.o : keyboard.c keyboard.h
 	$(version) -c keyboard.c $(flags)
+# Display compilation
+display.o : display.c display.h
+	$(version) -c display.c $(flags)
+# Worker compilation
+worker.o : worker.c worker.h
+	$(version) -c worker.c $(flags)
 
 # Clean part
 clean:
