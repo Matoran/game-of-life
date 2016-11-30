@@ -38,14 +38,14 @@ int neighbour(bool **oldState, uint line, uint column) {
  * @return new state
  */
 
-bool nextState(bool **oldState, uint line, uint column){
+bool nextState(bool **oldState, uint line, uint column) {
     int nbNeighbour = neighbour(oldState, line, column);
     if (oldState[line][column]) {
         if (nbNeighbour < 2) {
             return false;
-        }else if (nbNeighbour == 2 || nbNeighbour == 3) {
+        } else if (nbNeighbour == 2 || nbNeighbour == 3) {
             return true;
-        }else{
+        } else {
             return false;
         }
     } else {
@@ -69,20 +69,12 @@ void *worker(void *paramsWorker) {
         line = jump / (params->width - 2) + 1;
         column = jump % (params->width - 2) + 1;
 
-        params->actualState[line][column] = nextState(params->oldState, line, column);
+        (*params->actualState)[line][column] = nextState(*params->oldState, line, column);
 
         jump += params->numberThreads;
         if (jump >= size) {
             jump = params->idThread;
-            //wait all workers with one workersDisplayBarrier
             pthread_barrier_wait(params->workersDisplayBarrier);
-            while (jump < size) {
-                line = jump / (params->width - 2) + 1;
-                column = jump % (params->width - 2) + 1;
-                jump += params->numberThreads;
-                params->oldState[line][column] = params->actualState[line][column];
-            }
-            jump = params->idThread;
             pthread_barrier_wait(params->workersDisplayBarrier);
         }
     }

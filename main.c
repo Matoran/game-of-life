@@ -87,7 +87,7 @@ int main(int argc, char const *argv[]) {
         }
     }
 
-    createThreads(workers, width, height, oldState, frequency);
+    createThreads(workers, width, height, &oldState, frequency);
     clock_gettime(CLOCK_REALTIME, &finish);
     double elapsed = finish.tv_sec - start.tv_sec;
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;

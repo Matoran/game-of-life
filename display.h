@@ -7,7 +7,7 @@
 typedef unsigned int uint;
 
 typedef struct paramsDisplaySt {
-    bool **oldState, **actualState;
+    bool ***oldState, ***actualState;
     uint width, height;
     uint frequency;
     bool *end, *quit;

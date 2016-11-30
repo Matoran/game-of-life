@@ -4,16 +4,16 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-typedef unsigned int  uint;
+typedef unsigned int uint;
 
-typedef struct paramsWorkerSt{
+typedef struct paramsWorkerSt {
     uint numberThreads;
     uint idThread;
     pthread_barrier_t *workersDisplayBarrier;
-    bool **oldState, **actualState;
+    bool ***oldState, ***actualState;
     uint width, height;
     bool *quit;
-}paramsWorkerSt;
+} paramsWorkerSt;
 
 extern void *worker(void *paramsWorker);
 

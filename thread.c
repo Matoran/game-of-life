@@ -21,7 +21,7 @@
  * @param oldState: array 2D of booleans
  * @param frequency: image per second
  */
-void createThreads(uint numberWorkers, uint width, uint height, bool **oldState, uint frequency) {
+void createThreads(uint numberWorkers, uint width, uint height, bool ***oldState, uint frequency) {
     pthread_t threads[numberWorkers + 2];
     paramsWorkerSt paramsThread[numberWorkers];
 
@@ -40,7 +40,7 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
         paramsThread[i].width = width;
         paramsThread[i].height = height;
         paramsThread[i].oldState = oldState;
-        paramsThread[i].actualState = state;
+        paramsThread[i].actualState = &state;
         paramsThread[i].quit = &quit;
         int code = pthread_create(&threads[i], NULL, worker, &paramsThread[i]);
         if (code != 0) {
@@ -52,7 +52,7 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
     paramsDisplay.height = height;
     paramsDisplay.width = width;
     paramsDisplay.oldState = oldState;
-    paramsDisplay.actualState = state;
+    paramsDisplay.actualState = &state;
     paramsDisplay.workerDisplayBarrier = &barrier;
     paramsDisplay.quit = &quit;
     paramsDisplay.frequency = frequency;

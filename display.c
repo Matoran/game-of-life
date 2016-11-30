@@ -31,7 +31,7 @@ void *display(void *paramsDisplay) {
         gfx_clear(ctxt, COLOR_BLACK);
         for (uint line = 0; line < params->height; ++line) {
             for (uint column = 0; column < params->width; ++column) {
-                if (params->oldState[line][column]) {
+                if ((*params->oldState)[line][column]) {
                     gfx_putpixel(ctxt, column, line, COLOR_YELLOW);
                 }
 
@@ -41,15 +41,15 @@ void *display(void *paramsDisplay) {
         pthread_barrier_wait(params->workerDisplayBarrier);
         if (*params->end)
             *params->quit = *params->end;
-        /*bool **temp = *params->oldState;
+        bool **temp = *params->oldState;
         *params->oldState = *params->actualState;
-        *params->actualState = temp;*/
+        *params->actualState = temp;
         pthread_barrier_wait(params->workerDisplayBarrier);
 
         clock_gettime(CLOCK_REALTIME, &finish);
-        double elapsed = (finish.tv_sec-start.tv_sec)*1000000;
+        double elapsed = (finish.tv_sec - start.tv_sec) * 1000000;
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000.0;
-        if (microSecondToWait - elapsed > 0){
+        if (microSecondToWait - elapsed > 0) {
             usleep(microSecondToWait - elapsed);
         }
     }
