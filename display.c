@@ -1,15 +1,23 @@
-//
-// Created by matoran on 11/26/16.
-//
+/**
+ * @authors LOPES Marco, ISELI Cyril and RINGOT Gaëtan
+ * Purpose: Management of display
+ * Language:  C
+ * Date : november 2016
+ */
 
 #include "display.h"
 #include "gfx.h"
 #include <unistd.h>
 
+/**
+ * Display "Game of Life"
+ * @param paramsDisplay: struct which contain all information to perform the display
+ * @return NULL
+ */
 void *display(void *paramsDisplay) {
     paramsDisplaySt *params = (paramsDisplaySt *) paramsDisplay;
 
-    struct gfx_context_t *ctxt = gfx_create("Example", params->width, params->height);
+    struct gfx_context_t *ctxt = gfx_create("gofl", params->width, params->height);
     if (!ctxt) {
         fprintf(stderr, "Graphic mode initialization failed!\n");
         exit(1);
@@ -23,8 +31,8 @@ void *display(void *paramsDisplay) {
         gfx_clear(ctxt, COLOR_BLACK);
         for (uint line = 0; line < params->height; ++line) {
             for (uint column = 0; column < params->width; ++column) {
-                if (params->state[line][column]) {
-                    gfx_putpixel(ctxt, column, line, COLOR_GREEN);
+                if (params->oldState[line][column]) {
+                    gfx_putpixel(ctxt, column, line, COLOR_YELLOW);
                 }
 
             }
@@ -33,6 +41,9 @@ void *display(void *paramsDisplay) {
         pthread_barrier_wait(params->workerDisplayBarrier);
         if (*params->end)
             *params->quit = *params->end;
+        /*bool **temp = *params->oldState;
+        *params->oldState = *params->actualState;
+        *params->actualState = temp;*/
         pthread_barrier_wait(params->workerDisplayBarrier);
 
         clock_gettime(CLOCK_REALTIME, &finish);
@@ -40,13 +51,7 @@ void *display(void *paramsDisplay) {
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000.0;
         if (microSecondToWait - elapsed > 0){
             usleep(microSecondToWait - elapsed);
-            printf("%lf\n", microSecondToWait - elapsed);
-            printf("f %d\n", finish.tv_nsec);
-            printf("fs %d\n", finish.tv_sec);
-            printf("s %d\n", start.tv_nsec);
-            printf("ss %d\n", start.tv_sec);
         }
-
     }
 
     gfx_destroy(ctxt);

@@ -1,8 +1,8 @@
-/*
- * Authors: LOPES Marco, ISELI Cyril and RINGOT Gaëtan
- * Purpose: Management of threads.
+/**
+ * @authors: LOPES Marco, ISELI Cyril and RINGOT Gaëtan
+ * Purpose: Management of threads
  * Language:  C
- * Date : 23 november 2016
+ * Date : november 2016
  */
 
 #include <pthread.h>
@@ -12,11 +12,14 @@
 #include "display.h"
 #include "keyboard.h"
 
-/*
- *   Generate a number of threads
+/**
+ * Generate a number of threads
  *
- *
- *
+ * @param numberWorkers: number max of threads
+ * @param width: window width
+ * @param height: window height
+ * @param oldState: array 2D of booleans
+ * @param frequency: image per second
  */
 void createThreads(uint numberWorkers, uint width, uint height, bool **oldState, uint frequency) {
     pthread_t threads[numberWorkers + 2];
@@ -26,7 +29,7 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
     pthread_barrier_init(&barrier, NULL, numberWorkers + 1);
     bool end = false, quit = false;
 
-    bool **state = malloc(sizeof(bool *) * width);
+    bool **state = malloc(sizeof(bool *) * height);
     for (uint line = 0; line < height; ++line) {
         state[line] = malloc(sizeof(bool) * width);
     }
@@ -38,7 +41,6 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
         paramsThread[i].height = height;
         paramsThread[i].oldState = oldState;
         paramsThread[i].actualState = state;
-        paramsThread[i].end = &end;
         paramsThread[i].quit = &quit;
         int code = pthread_create(&threads[i], NULL, worker, &paramsThread[i]);
         if (code != 0) {
@@ -49,7 +51,8 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
     paramsDisplay.end = &end;
     paramsDisplay.height = height;
     paramsDisplay.width = width;
-    paramsDisplay.state = oldState;
+    paramsDisplay.oldState = oldState;
+    paramsDisplay.actualState = state;
     paramsDisplay.workerDisplayBarrier = &barrier;
     paramsDisplay.quit = &quit;
     paramsDisplay.frequency = frequency;
@@ -65,9 +68,10 @@ void createThreads(uint numberWorkers, uint width, uint height, bool **oldState,
     for (uint i = 0; i < numberWorkers + 2; ++i) {
         pthread_join(threads[i], NULL);
     }
+    for (uint line = 0; line < height; ++line) {
+        free(state[line]);
+    }
+    free(state);
+
     pthread_barrier_destroy(&barrier);
-
 }
-
-
-

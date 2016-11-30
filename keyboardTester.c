@@ -1,9 +1,21 @@
+/**
+ * @authors LOPES Marco, ISELI Cyril and RINGOT Gaëtan
+ * Purpose: Test keyboard manager
+ * Language:  C
+ * Date : november 2016
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include "keyboard.h"
 #include "gfx.h"
 
+/**
+ * Create SDL context and test keyboard manager
+ *
+ * @return EXIT_FAILURE or EXIT_SUCCESS
+ */
 int main() {
     struct gfx_context_t *ctxt = gfx_create("Example", 2, 2);
     if (!ctxt) {

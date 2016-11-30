@@ -1,6 +1,9 @@
-//
-// Created by matoran on 11/23/16.
-//
+/**
+ * @authors LOPES Marco, ISELI Cyril and RINGOT Gaëtan
+ * Purpose: Management of keyboard
+ * Language:  C
+ * Date : november 2016
+ */
 
 #include "keyboard.h"
 #include <SDL2/SDL.h>
@@ -8,9 +11,12 @@
 #include <unistd.h>
 #define FREQUENCE 50
 
-/// If a key was pressed, returns its key code (non blocking call).
-/// List of key codes: https://wiki.libsdl.org/SDL_Keycode
-/// @return the key that was pressed or 0 if none was pressed.
+/**
+ * If a key was pressed, returns its key code (non blocking call).
+ * List of key codes: https://wiki.libsdl.org/SDL_Keycode
+ *
+ * @return the key that was pressed or 0 if none was pressed.
+ */
 static SDL_Keycode keypress() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -20,6 +26,12 @@ static SDL_Keycode keypress() {
     return 0;
 }
 
+/**
+ * End program if the key esc is pressed
+ *
+ * @param paramsKeyboard: shared bool between all threads
+ * @return NULL
+ */
 void *keyboard(void *paramsKeyboard){
     bool *end = (bool*)paramsKeyboard;
     struct timespec start, finish;
@@ -30,7 +42,8 @@ void *keyboard(void *paramsKeyboard){
             *end = true;
         }
         clock_gettime(CLOCK_REALTIME, &finish);
-        double elapsed = (finish.tv_nsec - start.tv_nsec) / 1000.0;
+        double elapsed = (finish.tv_sec-start.tv_sec)*1000000;
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000.0;
         if(microSecondToWait-elapsed > 0)
             usleep(microSecondToWait-elapsed);
     }

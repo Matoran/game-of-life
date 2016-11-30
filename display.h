@@ -1,7 +1,3 @@
-//
-// Created by matoran on 11/26/16.
-//
-
 #ifndef GAME_OF_LIFE_DISPLAY_H
 #define GAME_OF_LIFE_DISPLAY_H
 
@@ -11,7 +7,7 @@
 typedef unsigned int uint;
 
 typedef struct paramsDisplaySt {
-    bool **state;
+    bool **oldState, **actualState;
     uint width, height;
     uint frequency;
     bool *end, *quit;

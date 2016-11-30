@@ -1,7 +1,3 @@
-//
-// Created by matoran on 11/26/16.
-//
-
 #ifndef GAME_OF_LIFE_WORKER_H
 #define GAME_OF_LIFE_WORKER_H
 
@@ -16,7 +12,7 @@ typedef struct paramsWorkerSt{
     pthread_barrier_t *workersDisplayBarrier;
     bool **oldState, **actualState;
     uint width, height;
-    bool *end, *quit;
+    bool *quit;
 }paramsWorkerSt;
 
 extern void *worker(void *paramsWorker);
