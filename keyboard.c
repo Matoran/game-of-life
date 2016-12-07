@@ -33,13 +33,14 @@ static SDL_Keycode keypress() {
  * @return NULL
  */
 void *keyboard(void *paramsKeyboard){
-    bool *end = (bool*)paramsKeyboard;
+    paramsKeyboardSt *params = (paramsKeyboardSt*)paramsKeyboard;
     struct timespec start, finish;
     double microSecondToWait = 1000000.0/FREQUENCE;
-    while (!*end) {
+    pthread_barrier_wait(params->displayInitialised);
+    while (!*params->end) {
         clock_gettime(CLOCK_REALTIME, &start);
         if(keypress() == SDLK_ESCAPE){
-            *end = true;
+            *params->end = true;
         }
         clock_gettime(CLOCK_REALTIME, &finish);
         double elapsed = (finish.tv_sec-start.tv_sec)*1000000;

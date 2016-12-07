@@ -28,8 +28,9 @@ void createThreads(uint numberWorkers, uint width, uint height, bool ***oldState
     pthread_t threads[numberWorkers + 2];
     paramsWorkerSt paramsThread[numberWorkers];
 
-    pthread_barrier_t barrier;
+    pthread_barrier_t barrier, displayInitialised;
     pthread_barrier_init(&barrier, NULL, numberWorkers + 1);
+    pthread_barrier_init(&displayInitialised, NULL, 2);
     bool end = false, quit = false;
 
     bool **state = malloc(sizeof(bool *) * height);
@@ -48,6 +49,7 @@ void createThreads(uint numberWorkers, uint width, uint height, bool ***oldState
         int code = pthread_create(&threads[i], NULL, worker, &paramsThread[i]);
         if (code != 0) {
             fprintf(stderr, "pthread_create failed!\n");
+            exit(42);
         }
     }
     paramsDisplaySt paramsDisplay;
@@ -59,13 +61,19 @@ void createThreads(uint numberWorkers, uint width, uint height, bool ***oldState
     paramsDisplay.workerDisplayBarrier = &barrier;
     paramsDisplay.quit = &quit;
     paramsDisplay.frequency = frequency;
+    paramsDisplay.displayInitialised = &displayInitialised;
     int code = pthread_create(&threads[numberWorkers], NULL, display, &paramsDisplay);
     if (code != 0) {
         fprintf(stderr, "pthread_create failed!\n");
+        exit(42);
     }
-    code = pthread_create(&threads[numberWorkers + 1], NULL, keyboard, &end);
+    paramsKeyboardSt paramsKeyboard;
+    paramsKeyboard.end = &end;
+    paramsKeyboard.displayInitialised = &displayInitialised;
+    code = pthread_create(&threads[numberWorkers + 1], NULL, keyboard, &paramsKeyboard);
     if (code != 0) {
         fprintf(stderr, "pthread_create failed!\n");
+        exit(42);
     }
 
     for (uint i = 0; i < numberWorkers + 2; ++i) {

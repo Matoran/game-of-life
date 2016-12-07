@@ -22,6 +22,7 @@ void *display(void *paramsDisplay) {
         fprintf(stderr, "Graphic mode initialization failed!\n");
         exit(1);
     }
+    pthread_barrier_wait(params->displayInitialised);
     struct timespec start, finish;
     double microSecondToWait = 1000000.0 / params->frequency;
 

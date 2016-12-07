@@ -5,37 +5,37 @@ clean = rm -rf *.o gameoflife keyboardTester
 
 # Main compilation
 gameoflife : main.o thread.o keyboard.o gfx.o display.o worker.o
-	$(version) main.o thread.o keyboard.o gfx.o display.o worker.o -o gameoflife -lrt -lpthread -lSDL2
+	$(version) $^ -o gameoflife -lrt -lpthread -lSDL2
 
 main.o : main.c
-	$(version) -c main.c $(flags)
+	$(version) -c $^ $(flags)
 
 # Keyboard Tester
 keyboardTester : keyboardTester.o keyboard.o gfx.o
-	$(version) keyboardTester.o keyboard.o gfx.o $(flags) -o keyboardTester -lSDL2
+	$(version) $^ $(flags) -o keyboardTester -lSDL2
 
 keyboardTester.o : keyboardTester.c
-	$(version) -c keyboardTester.c $(flags)
+	$(version) -c $^ $(flags)
 
 # Thread compilation
-thread.o : thread.c thread.h gfx.c gfx.h
-	$(version) -c gfx.c thread.c $(flags)
+thread.o : thread.c thread.h
+	$(version) -c $< $(flags)
 
 # Gfx compilation
 gfx.o : gfx.c gfx.h
-	$(version) -c gfx.c $(flags)
+	$(version) -c $< $(flags)
 
 # Keyboard compilation
 keyboard.o : keyboard.c keyboard.h
-	$(version) -c keyboard.c $(flags)
+	$(version) -c $< $(flags)
 
 # Display compilation
 display.o : display.c display.h
-	$(version) -c display.c $(flags)
+	$(version) -c $< $(flags)
 
 # Worker compilation
 worker.o : worker.c worker.h
-	$(version) -c worker.c $(flags)
+	$(version) -c $< $(flags)
 
 # Clean part
 clean:

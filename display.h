@@ -11,7 +11,7 @@ typedef struct paramsDisplaySt {
     uint width, height;
     uint frequency;
     bool *end, *quit;
-    pthread_barrier_t *workerDisplayBarrier;
+    pthread_barrier_t *workerDisplayBarrier, *displayInitialised;
 } paramsDisplaySt;
 
 extern void *display(void *paramsDisplay);
