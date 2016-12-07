@@ -50,7 +50,7 @@ int checkSyntaxError(uint width, uint height, double probability, uint freq, uin
  * @return EXIT_FAILURE or EXIT_SUCCESS
  */
 int main(int argc, char const *argv[]) {
-    if ((argc < 7) || (argv > 7)) {
+    if ((argc < 7) || (argc > 7)) {
         printf("Usage: ./gameoflife <width> <height> <seed> <p> <freq> <#workers>\n");
         printf("Example: gameoflife 240 135 0 0.75 30 8\n");
         return EXIT_FAILURE;
