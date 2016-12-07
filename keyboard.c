@@ -7,7 +7,6 @@
 
 #include "keyboard.h"
 #include <SDL2/SDL.h>
-#include <stdbool.h>
 #include <unistd.h>
 #define FREQUENCE 50
 

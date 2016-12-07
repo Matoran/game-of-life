@@ -12,7 +12,7 @@ main.o : main.c
 
 # Keyboard Tester
 keyboardTester : keyboardTester.o keyboard.o gfx.o
-	$(version) $^ $(flags) -o keyboardTester -lSDL2
+	$(version) $^ $(flags) -o keyboardTester -lSDL2 -lpthread
 
 keyboardTester.o : keyboardTester.c
 	$(version) -c $^ $(flags)
