@@ -22,6 +22,9 @@
  * @param frequency: image per second
  */
 void createThreads(uint numberWorkers, uint width, uint height, bool ***oldState, uint frequency) {
+    uint size = (height - 2) * (width - 2);
+    if(numberWorkers > size)
+        numberWorkers = size;
     pthread_t threads[numberWorkers + 2];
     paramsWorkerSt paramsThread[numberWorkers];
 

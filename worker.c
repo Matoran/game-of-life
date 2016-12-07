@@ -66,6 +66,7 @@ void *worker(void *paramsWorker) {
     uint line, column;
 
     while (!*params->quit) {
+
         line = jump / (params->width - 2) + 1;
         column = jump % (params->width - 2) + 1;
 

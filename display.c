@@ -11,7 +11,7 @@
 
 /**
  * Display "Game of Life"
- * @param paramsDisplay: struct which contain all information to perform the display
+ * @param paramsDisplay: struct which contain all informations to perform the display
  * @return NULL
  */
 void *display(void *paramsDisplay) {
